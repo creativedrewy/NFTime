@@ -6,15 +6,22 @@ import android.view.SurfaceHolder
 import androidx.wear.watchface.*
 import androidx.wear.watchface.style.CurrentUserStyleRepository
 import androidx.wear.watchface.style.UserStyleSchema
+import org.rajawali3d.Object3D
+import org.rajawali3d.animation.Animation
+import org.rajawali3d.animation.RotateAnimation3D
+import org.rajawali3d.animation.TranslateAnimation3D
 import org.rajawali3d.materials.Material
 import org.rajawali3d.materials.MaterialManager
 import org.rajawali3d.materials.textures.TextureManager
 import org.rajawali3d.math.vector.Vector3
-import org.rajawali3d.primitives.Cube
+import org.rajawali3d.primitives.Plane
+import org.rajawali3d.primitives.Sphere
 import org.rajawali3d.util.RajLog
 import org.rajawali3d.wear.EmptyGL10
 import java.time.ZonedDateTime
 import javax.microedition.khronos.opengles.GL10
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class NFTimeWatchFaceService : WatchFaceService() {
@@ -70,51 +77,73 @@ class NFTimeWatchFaceService : WatchFaceService() {
 
         class RajawaliRenderer : org.rajawali3d.renderer.Renderer(myCtx) {
 
-            val cube = Cube(1f, false, false)
-
             override fun initScene() {
                 RajLog.setDebugEnabled(true)
-
-                //				Material material = new Material();
-                //				material.addTexture(new Texture("earthColors",
-                //												R.drawable.earthtruecolor_nasa_big));
-                //				material.setColorInfluence(0);
-                //				mSphere = new Sphere(1, 24, 24);
-                //				mSphere.setMaterial(material);
-                //				getCurrentScene().addChild(mSphere);
 
                 val material = Material()
                 material.colorInfluence = 1.0f
                 material.color = Color.RED
 
-                cube.material = material
+                val emptyParent = Object3D()
+                currentScene.addChild(emptyParent)
 
-                currentScene.addChild(cube)
+                val ball = Sphere(0.75f, 24, 24)
+                ball.material = Material().apply {
+                    color = Color.GREEN
+                    colorInfluence = 1.0f
+                }
+                emptyParent.addChild(ball)
+
+                //val cube = Cube(1f, false, false)
+                val plane = Plane(1f, 1f, 1, 1)
+                plane.isDoubleSided = true
+                plane.material = material
+                plane.z = 2.0
+                plane.x = 0.0
+                emptyParent.addChild(plane)
+
+                val plane2 = Plane(1f, 1f, 1, 1)
+                plane2.isDoubleSided = true
+                plane2.material = material
+                plane2.z = 2 * cos(Math.toRadians(45.0))
+                plane2.x = 2 * sin(Math.toRadians(45.0))
+                plane2.rotY = -45.0
+                emptyParent.addChild(plane2)
+
+                val plane3 = Plane(1f, 1f, 1, 1)
+                plane3.isDoubleSided = true
+                plane3.material = material
+                plane3.z = 0.0
+                plane3.x = 2.0
+                plane3.rotY = -90.0
+                emptyParent.addChild(plane3)
 
                 currentCamera.enableLookAt()
                 currentCamera.setLookAt(0.0, 0.0, 0.0)
+                currentCamera.y = 6.0
                 currentCamera.z = 6.0
-                currentCamera.orientation = currentCamera.orientation.inverse()
 
-                //            getCurrentCamera().enableLookAt();
-                //            getCurrentCamera().setLookAt(0, 0, 0);
-                //            getCurrentCamera().setZ(6);
-                //			getCurrentCamera().setOrientation(getCurrentCamera().getOrientation().inverse());
+                val updownCamer = TranslateAnimation3D(Vector3(0.0, 6.0, 6.0), Vector3(0.0, 0.0, 6.0))
+                updownCamer.transformable3D = currentCamera
+                updownCamer.durationMilliseconds = 5000
+                updownCamer.repeatMode = Animation.RepeatMode.REVERSE_INFINITE
+                currentScene.registerAnimation(updownCamer)
+                //updownCamer.play()
+
+                val anim = RotateAnimation3D(Vector3(0.0, 359.0, 0.0))
+                anim.transformable3D = emptyParent
+                anim.durationMilliseconds = 20000
+                anim.repeatMode = Animation.RepeatMode.REVERSE_INFINITE
+                currentScene.registerAnimation(anim)
+                anim.play()
             }
 
-            override fun onRenderFrame(gl: GL10?) {
-                super.onRenderFrame(gl)
+//            override fun onRenderFrame(gl: GL10?) {
+//                super.onRenderFrame(gl)
+//            }
 
-                cube.rotate(Vector3.Axis.Y, 1.0);
-            }
-
-            override fun onOffsetsChanged(xOffset: Float, yOffset: Float, xOffsetStep: Float, yOffsetStep: Float, xPixelOffset: Int, yPixelOffset: Int) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onTouchEvent(event: MotionEvent?) {
-                TODO("Not yet implemented")
-            }
+            override fun onOffsetsChanged(xOffset: Float, yOffset: Float, xOffsetStep: Float, yOffsetStep: Float, xPixelOffset: Int, yPixelOffset: Int) { }
+            override fun onTouchEvent(event: MotionEvent?) { }
         }
 
         val oglRenderer = object : Renderer.GlesRenderer(
