@@ -1,0 +1,47 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        applicationId "com.creativedrewy.nfttime.watchface"
+        minSdk 30
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+dependencies {
+    implementation 'androidx.core:core-ktx:1.8.0'
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.palette:palette-ktx:1.0.0'
+
+    implementation ("com.github.rajawali:rajawali:1.2.1970") {
+        exclude group: 'com.google.android.support', module: 'wearable'
+    }
+
+    //WearOS Dependencies
+    implementation "androidx.wear:wear:1.2.0"
+    implementation "androidx.wear.watchface:watchface:1.1.0"
+    implementation "androidx.wear.watchface:watchface-client:1.1.0"
+    implementation "androidx.wear.watchface:watchface-data:1.1.0"
+    implementation "androidx.wear.watchface:watchface-editor:1.1.0"
+    implementation "androidx.wear.watchface:watchface-style:1.1.0"
+    implementation "androidx.wear.watchface:watchface-complications-data:1.1.0"
+    implementation "androidx.wear.watchface:watchface-complications-data-source:1.1.0"
+    implementation "androidx.wear.watchface:watchface-complications-rendering:1.1.0"
+}
+
