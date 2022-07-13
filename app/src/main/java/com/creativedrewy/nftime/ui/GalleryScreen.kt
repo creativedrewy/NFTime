@@ -6,11 +6,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.creativedrewy.nftime.theme.NFTimeTheme
-import com.creativedrewy.nftime.viewmodel.MainViewModel
+import com.creativedrewy.nftime.viewmodel.GalleryViewModel
 
 @Composable
 fun GalleryScreen(
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: GalleryViewModel = hiltViewModel()
 ) {
     LaunchedEffect(
         key1 = Unit,

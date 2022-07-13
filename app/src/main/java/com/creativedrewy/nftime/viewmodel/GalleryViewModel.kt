@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
+class GalleryViewModel @Inject constructor() : ViewModel() {
 
     private val _state = MutableStateFlow<String>("")
 
