@@ -9,10 +9,17 @@ import com.metaplex.lib.solana.SolanaConnectionDriver
 import com.solana.core.PublicKey
 import com.solana.networking.RPCEndpoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
+
+    private val _state = MutableStateFlow<String>("")
+
+    val viewState: StateFlow<String>
+        get() = _state
 
     fun loadNfts() {
         val ownerPublicKey = PublicKey("8hEeWszgrA2XkRK4GH6zL4Qq5wJBwotwsB6VEweD8YEQ")
@@ -26,6 +33,12 @@ class MainViewModel @Inject constructor() : ViewModel() {
             result.onSuccess { nfts ->
                 nfts.filterNotNull().forEach {
                     Log.v("Andrew", "Your NFT name: ${ it.name }")
+
+//                    it.metadata(metaplex) { metaLoad ->
+//                        metaLoad.onSuccess { meta ->
+//                            meta.external_url
+//                        }
+//                    }
                 }
             }
         }
