@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.creativedrewy.nftime">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".NFTImeApp"
         android:allowBackup="true"
