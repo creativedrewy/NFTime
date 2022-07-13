@@ -1,12 +1,22 @@
 package com.creativedrewy.nftime.ui
 
-import androidx.compose.material.Text
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.creativedrewy.nftime.theme.NFTimeTheme
 import com.creativedrewy.nftime.viewmodel.GalleryViewModel
+import com.creativedrewy.nftime.viewmodel.Loading
+import com.creativedrewy.nftime.viewmodel.NftViewProps
 
 @Composable
 fun GalleryScreen(
@@ -19,20 +29,41 @@ fun GalleryScreen(
         }
     )
 
-    Greeting(name = "Andrew")
+    val viewState by viewModel.viewState.collectAsState()
+    val isLoading = viewState is Loading
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        PhotoGrid(
+            items = viewState.listItems
+        )
+    }
+}
+
+@OptIn(
+    ExperimentalFoundationApi::class
+)
+@Composable
+fun PhotoGrid(items: List<NftViewProps>) {
+    LazyVerticalGrid(
+        cells = GridCells.Fixed(2)
+    ) {
+        items(items) { nft ->
+            PhotoItem(nft = nft)
+        }
+    }
 }
 
 @Composable
-fun Greeting(
-    name: String
-) {
-    Text(text = "Hello $name!")
-}
+fun PhotoItem(nft: NftViewProps) {
+    Box(
+        modifier = Modifier
+            .padding(8.dp)
+            .width(50.dp)
+            .height(50.dp)
+            .background(Color.Red)
+    ) {
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    NFTimeTheme {
-        Greeting("Android")
     }
 }

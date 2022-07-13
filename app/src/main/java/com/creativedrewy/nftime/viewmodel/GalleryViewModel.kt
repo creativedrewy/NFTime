@@ -16,9 +16,9 @@ import javax.inject.Inject
 @HiltViewModel
 class GalleryViewModel @Inject constructor() : ViewModel() {
 
-    private val _state = MutableStateFlow<String>("")
+    private val _state = MutableStateFlow<NftGalleryViewState>(Empty())
 
-    val viewState: StateFlow<String>
+    val viewState: StateFlow<NftGalleryViewState>
         get() = _state
 
     fun loadNfts() {
@@ -31,7 +31,7 @@ class GalleryViewModel @Inject constructor() : ViewModel() {
 
         metaplex.nft.findAllByOwner(ownerPublicKey) { result ->
             result.onSuccess { nfts ->
-                nfts.filterNotNull().forEach {
+                val result = nfts.filterNotNull().map {
                     Log.v("Andrew", "Your NFT name: ${ it.name }")
 
 //                    it.metadata(metaplex) { metaLoad ->
@@ -39,7 +39,15 @@ class GalleryViewModel @Inject constructor() : ViewModel() {
 //                            meta.external_url
 //                        }
 //                    }
+
+                    val props = NftViewProps(
+                        name = it.name
+                    )
+
+                    props
                 }
+
+                _state.value = Completed(result)
             }
         }
     }
