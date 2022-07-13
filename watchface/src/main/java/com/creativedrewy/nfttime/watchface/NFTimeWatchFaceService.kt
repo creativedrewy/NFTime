@@ -1,6 +1,6 @@
 package com.creativedrewy.nfttime.watchface
 
-import android.graphics.*
+import android.graphics.Color
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.wear.watchface.*
@@ -48,34 +48,7 @@ class NFTimeWatchFaceService : WatchFaceService() {
 //            canvasType = CanvasType.HARDWARE
 //        )
 
-        val myCtx = this
-
-        val renderer = object : Renderer.CanvasRenderer(
-            surfaceHolder,
-            currentUserStyleRepository,
-            watchState,
-            CanvasType.HARDWARE,
-            16L
-        ) {
-            var backgroundBg = BitmapFactory.decodeResource(resources, R.drawable.watchface_service_bg)
-
-            override fun render(canvas: Canvas, bounds: Rect, zonedDateTime: ZonedDateTime) {
-                canvas.drawColor(Color.RED)
-
-                val scale = bounds.width() / backgroundBg.width.toFloat()
-//                backgroundBg = Bitmap.createScaledBitmap(backgroundBg, (bounds.width() * scale).toInt(), (bounds.height() * scale).toInt(), true)
-//
-                canvas.drawBitmap(backgroundBg, 0f, 0f, Paint())
-            }
-
-            override fun renderHighlightLayer(canvas: Canvas, bounds: Rect, zonedDateTime: ZonedDateTime
-            ) {
-
-            }
-
-        }
-
-        class RajawaliRenderer : org.rajawali3d.renderer.Renderer(myCtx) {
+        class RajawaliRenderer : org.rajawali3d.renderer.Renderer(this@NFTimeWatchFaceService) {
 
             override fun initScene() {
                 RajLog.setDebugEnabled(true)
@@ -87,41 +60,33 @@ class NFTimeWatchFaceService : WatchFaceService() {
                 val emptyParent = Object3D()
                 currentScene.addChild(emptyParent)
 
-                val ball = Sphere(0.75f, 24, 24)
+                val ball = Sphere(0.5f, 24, 24)
                 ball.material = Material().apply {
                     color = Color.GREEN
                     colorInfluence = 1.0f
                 }
                 emptyParent.addChild(ball)
 
-                //val cube = Cube(1f, false, false)
-                val plane = Plane(1f, 1f, 1, 1)
-                plane.isDoubleSided = true
-                plane.material = material
-                plane.z = 2.0
-                plane.x = 0.0
-                emptyParent.addChild(plane)
+                val radius = 1.15
+                val planeCount = 6
+                val angleInterval = 360 / planeCount
+                for (i in 0..planeCount) {
+                    val angle = i * angleInterval
 
-                val plane2 = Plane(1f, 1f, 1, 1)
-                plane2.isDoubleSided = true
-                plane2.material = material
-                plane2.z = 2 * cos(Math.toRadians(45.0))
-                plane2.x = 2 * sin(Math.toRadians(45.0))
-                plane2.rotY = -45.0
-                emptyParent.addChild(plane2)
+                    val plane = Plane(1f, 1f, 1, 1)
+                    plane.isDoubleSided = true
+                    plane.material = material
+                    plane.z = radius * cos(Math.toRadians(angle.toDouble()))
+                    plane.x = radius * sin(Math.toRadians(angle.toDouble()))
+                    plane.rotY = -angle.toDouble()
 
-                val plane3 = Plane(1f, 1f, 1, 1)
-                plane3.isDoubleSided = true
-                plane3.material = material
-                plane3.z = 0.0
-                plane3.x = 2.0
-                plane3.rotY = -90.0
-                emptyParent.addChild(plane3)
+                    emptyParent.addChild(plane)
+                }
 
                 currentCamera.enableLookAt()
                 currentCamera.setLookAt(0.0, 0.0, 0.0)
-                currentCamera.y = 6.0
-                currentCamera.z = 6.0
+                //currentCamera.z = 6.0
+                currentCamera.z = 4.0
 
                 val updownCamer = TranslateAnimation3D(Vector3(0.0, 6.0, 6.0), Vector3(0.0, 0.0, 6.0))
                 updownCamer.transformable3D = currentCamera
@@ -130,17 +95,13 @@ class NFTimeWatchFaceService : WatchFaceService() {
                 currentScene.registerAnimation(updownCamer)
                 //updownCamer.play()
 
-                val anim = RotateAnimation3D(Vector3(0.0, 359.0, 0.0))
+                val anim = RotateAnimation3D(Vector3(0.0, 359.9, 0.0))
                 anim.transformable3D = emptyParent
-                anim.durationMilliseconds = 20000
-                anim.repeatMode = Animation.RepeatMode.REVERSE_INFINITE
+                anim.durationMilliseconds = 50000
+                anim.repeatMode = Animation.RepeatMode.INFINITE
                 currentScene.registerAnimation(anim)
                 anim.play()
             }
-
-//            override fun onRenderFrame(gl: GL10?) {
-//                super.onRenderFrame(gl)
-//            }
 
             override fun onOffsetsChanged(xOffset: Float, yOffset: Float, xOffsetStep: Float, yOffsetStep: Float, xPixelOffset: Int, yPixelOffset: Int) { }
             override fun onTouchEvent(event: MotionEvent?) { }
