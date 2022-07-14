@@ -1,17 +1,23 @@
 package com.creativedrewy.nftime.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.metaplex.lib.Metaplex
 import com.metaplex.lib.drivers.indenty.ReadOnlyIdentityDriver
 import com.metaplex.lib.drivers.storage.OkHttpSharedStorageDriver
+import com.metaplex.lib.modules.nfts.NftClient
+import com.metaplex.lib.modules.nfts.models.JsonMetadata
+import com.metaplex.lib.modules.nfts.models.NFT
 import com.metaplex.lib.solana.SolanaConnectionDriver
 import com.solana.core.PublicKey
 import com.solana.networking.RPCEndpoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class GalleryViewModel @Inject constructor() : ViewModel() {
@@ -29,27 +35,41 @@ class GalleryViewModel @Inject constructor() : ViewModel() {
 
         val metaplex = Metaplex(solanaConnection, solanaIdentityDriver, storageDriver)
 
-        metaplex.nft.findAllByOwner(ownerPublicKey) { result ->
-            result.onSuccess { nfts ->
-                val myNfts = nfts.filterNotNull().map {
-                    Log.v("Andrew", "Your NFT name: ${ it.name }")
+        viewModelScope.launch {
+            val myNfts = metaplex.nft.findAllByOwner(ownerPublicKey)
 
-//                    it.metadata(metaplex) { metaLoad ->
-//                        metaLoad.onSuccess { meta ->
-//                            meta.external_url
-//                        }
-//                    }
+            val props = myNfts.take(10).map { nft ->
+                val jsonMeta = nft.loadMeta(metaplex)
 
-                    val props = NftViewProps(
-                        name = it.name
-                    )
-
-                    props
-                }
-
-                _state.value = Completed(myNfts)
+                NftViewProps(
+                    name = nft.name,
+                    displayImageUrl = jsonMeta.image ?: ""
+                )
             }
+
+            _state.value = Completed(props)
+        }
+    }
+}
+
+suspend fun NftClient.findAllByOwner(key: PublicKey): List<NFT> =
+    suspendCoroutine { cont ->
+        findAllByOwner(key) { result ->
+            result.onSuccess {
+                cont.resume(it.filterNotNull())
+            }
+
+            result.onFailure { throw it }
         }
     }
 
-}
+suspend fun NFT.loadMeta(plex: Metaplex): JsonMetadata =
+    suspendCoroutine { cont ->
+        this.metadata(plex) { result ->
+            result.onSuccess { jsonMeta ->
+                cont.resume(jsonMeta)
+            }
+
+            result.onFailure { throw it }
+        }
+    }

@@ -1,7 +1,6 @@
 package com.creativedrewy.nftime.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
@@ -10,10 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.creativedrewy.nftime.viewmodel.GalleryViewModel
 import com.creativedrewy.nftime.viewmodel.Loading
 import com.creativedrewy.nftime.viewmodel.NftViewProps
@@ -62,8 +63,15 @@ fun PhotoItem(nft: NftViewProps) {
             .padding(8.dp)
             .fillMaxWidth()
             .aspectRatio(1f)
-            .background(Color.Red)
     ) {
-
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f),
+            model = nft.displayImageUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center
+        )
     }
 }
