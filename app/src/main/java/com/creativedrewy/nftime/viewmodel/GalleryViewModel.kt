@@ -31,7 +31,7 @@ class GalleryViewModel @Inject constructor() : ViewModel() {
 
         metaplex.nft.findAllByOwner(ownerPublicKey) { result ->
             result.onSuccess { nfts ->
-                val result = nfts.filterNotNull().map {
+                val myNfts = nfts.filterNotNull().map {
                     Log.v("Andrew", "Your NFT name: ${ it.name }")
 
 //                    it.metadata(metaplex) { metaLoad ->
@@ -47,7 +47,7 @@ class GalleryViewModel @Inject constructor() : ViewModel() {
                     props
                 }
 
-                _state.value = Completed(result)
+                _state.value = Completed(myNfts)
             }
         }
     }

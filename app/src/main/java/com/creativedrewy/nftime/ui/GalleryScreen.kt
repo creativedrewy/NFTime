@@ -60,8 +60,8 @@ fun PhotoItem(nft: NftViewProps) {
     Box(
         modifier = Modifier
             .padding(8.dp)
-            .width(50.dp)
-            .height(50.dp)
+            .fillMaxWidth()
+            .aspectRatio(1f)
             .background(Color.Red)
     ) {
 
